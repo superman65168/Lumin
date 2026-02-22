@@ -11,11 +11,22 @@ from functools import wraps
 from typing import Any
 
 try:
-    import psycopg2
-    from psycopg2.extras import DictCursor
-except ImportError:  # pragma: no cover - optional for SQLite-only usage
-    psycopg2 = None
-    DictCursor = None
+    import psycopg
+    from psycopg.rows import dict_row
+    PSYCOPG_DRIVER = "psycopg"
+except ImportError:
+    psycopg = None
+    dict_row = None
+    PSYCOPG_DRIVER = None
+
+if PSYCOPG_DRIVER is None:
+    try:
+        import psycopg2
+        from psycopg2.extras import DictCursor
+        PSYCOPG_DRIVER = "psycopg2"
+    except ImportError:  # pragma: no cover - optional for SQLite-only usage
+        psycopg2 = None
+        DictCursor = None
 
 from flask import (
     Flask,
@@ -96,8 +107,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 class PostgresAdapter:
-    def __init__(self, conn: "psycopg2.extensions.connection") -> None:
+    def __init__(self, conn: Any, driver: str) -> None:
         self.conn = conn
+        self.driver = driver
 
     def _prepare_query(self, query: str) -> str:
         query = query.replace("last_insert_rowid()", "lastval()")
@@ -130,10 +142,16 @@ class PostgresAdapter:
 def get_db() -> Any:
     if "db" not in g:
         if USE_POSTGRES:
-            if psycopg2 is None or DictCursor is None:
-                raise RuntimeError("psycopg2 is required for SUPABASE_DB_URL connections.")
-            conn = psycopg2.connect(DB_URL, sslmode="require", cursor_factory=DictCursor)
-            g.db = PostgresAdapter(conn)
+            if PSYCOPG_DRIVER is None:
+                raise RuntimeError(
+                    "psycopg or psycopg2 is required for SUPABASE_DB_URL connections."
+                )
+            if PSYCOPG_DRIVER == "psycopg":
+                conn = psycopg.connect(DB_URL, sslmode="require", row_factory=dict_row)
+                g.db = PostgresAdapter(conn, "psycopg")
+            else:
+                conn = psycopg2.connect(DB_URL, sslmode="require", cursor_factory=DictCursor)
+                g.db = PostgresAdapter(conn, "psycopg2")
         else:
             g.db = sqlite3.connect(DB_PATH)
             g.db.row_factory = sqlite3.Row
