@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>{{ "Edit staff" if staff else "Add staff" }}</h2>
+  <a class="button secondary" href="{{ url_for('staff_list') }}">Back</a>
+</div>
+{% if error %}
+  <div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post" class="form">
+  <div class="form-grid">
+    <label>
+      First name
+      <input name="first_name" value="{{ staff.first_name if staff else '' }}" required />
+    </label>
+    <label>
+      Last name
+      <input name="last_name" value="{{ staff.last_name if staff else '' }}" required />
+    </label>
+    <label>
+      Role
+      <input name="role" value="{{ staff.role if staff else '' }}" />
+    </label>
+    <label>
+      Email
+      <input name="email" type="email" value="{{ staff.email if staff else '' }}" />
+    </label>
+    <label>
+      Phone
+      <input name="phone" value="{{ staff.phone if staff else '' }}" />
+    </label>
+  </div>
+  <button class="button" type="submit">Save</button>
+</form>
+{% endblock %}

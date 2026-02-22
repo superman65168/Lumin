@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>{{ "Edit admission" if admission else "Add admission" }}</h2>
+  <a class="button secondary" href="{{ url_for('admissions_list') }}">Back</a>
+</div>
+{% if error %}
+  <div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post" class="form">
+  <div class="form-grid">
+    <label>
+      Student
+      <select name="student_id">
+        <option value="">Unassigned</option>
+        {% for student in students %}
+          <option value="{{ student.id }}" {% if admission and (admission.student_id|string) == (student.id|string) %}selected{% endif %}>
+            {{ student.first_name }} {{ student.last_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Program
+      <input name="program" value="{{ admission.program if admission else '' }}" required />
+    </label>
+    <label>
+      Intake
+      <input name="intake" value="{{ admission.intake if admission else '' }}" />
+    </label>
+    <label>
+      Status
+      <input name="status" value="{{ admission.status if admission else '' }}" />
+    </label>
+    <label class="full">
+      Notes
+      <textarea name="notes" rows="4">{{ admission.notes if admission else '' }}</textarea>
+    </label>
+  </div>
+  <button class="button" type="submit">Save</button>
+</form>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Audit trail</h2>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Action</th>
+      <th>Entity</th>
+      <th>Entity ID</th>
+      <th>Details</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.username or 'System' }}</td>
+      <td>{{ log.action }}</td>
+      <td>{{ log.entity }}</td>
+      <td>{{ log.entity_id or '-' }}</td>
+      <td>{{ log.details or '-' }}</td>
+      <td>{{ log.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" class="empty">No audit records yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

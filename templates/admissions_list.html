@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Admissions</h2>
+  <a class="button" href="{{ url_for('admissions_new') }}">Add admission</a>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Program</th>
+      <th>Intake</th>
+      <th>Status</th>
+      <th>Notes</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for admission in admissions %}
+    <tr>
+      <td>
+        {% if admission.first_name %}
+          {{ admission.first_name }} {{ admission.last_name }}
+        {% else %}
+          Unassigned
+        {% endif %}
+      </td>
+      <td>{{ admission.program }}</td>
+      <td>{{ admission.intake or "-" }}</td>
+      <td>{{ admission.status or "-" }}</td>
+      <td>{{ admission.notes or "-" }}</td>
+      <td class="table-actions">
+        <a class="link" href="{{ url_for('admissions_edit', admission_id=admission.id) }}">Edit</a>
+        <form method="post" action="{{ url_for('admissions_delete', admission_id=admission.id) }}">
+          <button class="link danger" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" class="empty">No admissions added yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

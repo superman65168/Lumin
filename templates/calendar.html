@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Calendar</h2>
+  <a class="button secondary" href="{{ url_for('calendar_export') }}">Export .ics</a>
+</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due date</th>
+      <th>Assigned</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr>
+      <td>{{ task.title }}</td>
+      <td>{{ task.due_date or '-' }}</td>
+      <td>
+        {% if task.first_name %}
+          {{ task.first_name }} {{ task.last_name }}
+        {% else %}
+          Unassigned
+        {% endif %}
+      </td>
+      <td>{{ task.status }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="4" class="empty">No scheduled tasks yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

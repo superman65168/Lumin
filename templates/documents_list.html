@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Documents</h2>
+</div>
+<form class="form" method="post" action="{{ url_for('documents_upload') }}" enctype="multipart/form-data">
+  <div class="form-grid">
+    <label>
+      Student
+      <select name="student_id">
+        <option value="">Unassigned</option>
+        {% for student in students %}
+          <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="full">
+      File
+      <input type="file" name="file" required />
+    </label>
+  </div>
+  <button class="button" type="submit">Upload document</button>
+</form>
+
+<table class="table" style="margin-top: 1.5rem;">
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Student</th>
+      <th>Uploaded</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for doc in documents %}
+    <tr>
+      <td>{{ doc.filename }}</td>
+      <td>
+        {% if doc.first_name %}
+          {{ doc.first_name }} {{ doc.last_name }}
+        {% else %}
+          Unassigned
+        {% endif %}
+      </td>
+      <td>{{ doc.uploaded_at }}</td>
+      <td class="table-actions">
+        <a class="link" href="{{ url_for('documents_download', document_id=doc.id) }}">Download</a>
+        <form method="post" action="{{ url_for('documents_delete', document_id=doc.id) }}">
+          <button class="link danger" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="4" class="empty">No documents uploaded yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

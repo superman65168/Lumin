@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title or "Medzone Agency Manager" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button class="drawer-toggle" type="button" aria-label="Open menu">☰</button>
+      <div class="brand">
+        <img class="logo" src="{{ url_for('static', filename='medzone-logo.png') }}" alt="Medzone Study Abroad" />
+        <div>
+          <div class="brand-title">Medzone Study Abroad</div>
+          <div class="brand-subtitle">Agency operations and admissions management</div>
+        </div>
+      </div>
+      <div class="user-meta">
+        <div class="user-name">{{ g.user.username if g.user else '' }}</div>
+        <a class="button secondary" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="drawer" aria-label="Main navigation">
+        <nav class="drawer-nav">
+          <a href="{{ url_for('index') }}">Dashboard</a>
+          <a href="{{ url_for('students_list') }}">Students</a>
+          <a href="{{ url_for('fees_list') }}">Fees</a>
+          <a href="{{ url_for('documents_list') }}">Documents</a>
+          <a href="{{ url_for('courses_list') }}">Courses</a>
+          <a href="{{ url_for('staff_list') }}">Staff</a>
+          <a href="{{ url_for('reports') }}">Reports</a>
+          {% if g.user and g.user.role == 'admin' %}
+            <a href="{{ url_for('audit_logs') }}">Audit</a>
+          {% endif %}
+          <a href="{{ url_for('notifications_list') }}">Notifications</a>
+          <a href="{{ url_for('calendar_view') }}">Calendar</a>
+          <a href="{{ url_for('exports') }}">Exports</a>
+          {% if g.user and g.user.role == 'admin' %}
+            <a href="{{ url_for('users_list') }}">Users</a>
+          {% endif %}
+        </nav>
+      </aside>
+      <main class="container">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <div class="drawer-overlay" aria-hidden="true"></div>
+    <script>
+      const toggle = document.querySelector('.drawer-toggle');
+      const drawer = document.querySelector('.drawer');
+      const overlay = document.querySelector('.drawer-overlay');
+      const closeDrawer = () => {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+      };
+      toggle?.addEventListener('click', () => {
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('open');
+      });
+      overlay?.addEventListener('click', closeDrawer);
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeDrawer();
+        }
+      });
+    </script>
+  </body>
+</html>

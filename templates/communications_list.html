@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Communications</h2>
+</div>
+<form class="form" method="post" action="{{ url_for('communications_new') }}">
+  <div class="form-grid">
+    <label>
+      Student
+      <select name="student_id">
+        <option value="">General</option>
+        {% for student in students %}
+          <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Channel
+      <select name="channel">
+        <option>Email</option>
+        <option>Phone</option>
+        <option>WhatsApp</option>
+        <option>In person</option>
+      </select>
+    </label>
+    <label class="full">
+      Subject
+      <input name="subject" />
+    </label>
+    <label class="full">
+      Notes
+      <textarea name="notes" rows="4" required></textarea>
+    </label>
+  </div>
+  <button class="button" type="submit">Log communication</button>
+</form>
+
+<table class="table" style="margin-top: 1.5rem;">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Channel</th>
+      <th>Subject</th>
+      <th>Notes</th>
+      <th>Logged</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in communications %}
+    <tr>
+      <td>
+        {% if item.first_name %}
+          {{ item.first_name }} {{ item.last_name }}
+        {% else %}
+          General
+        {% endif %}
+      </td>
+      <td>{{ item.channel }}</td>
+      <td>{{ item.subject or '-' }}</td>
+      <td>{{ item.notes }}</td>
+      <td>{{ item.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5" class="empty">No communications logged yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

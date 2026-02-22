@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Fees</h2>
+</div>
+<form class="filters" method="get">
+  <div class="filter-grid">
+    <label>
+      Status
+      <select name="status">
+        <option value="">All</option>
+        {% for item in statuses %}
+          <option value="{{ item.status }}" {% if filters.status == item.status %}selected{% endif %}>
+            {{ item.status }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Minimum paid
+      <input name="min_paid" type="number" step="0.01" min="0" value="{{ filters.min_paid }}" />
+    </label>
+    <label>
+      Maximum paid
+      <input name="max_paid" type="number" step="0.01" min="0" value="{{ filters.max_paid }}" />
+    </label>
+    <label class="checkbox">
+      <input name="unpaid" type="checkbox" value="1" {% if filters.unpaid %}checked{% endif %} />
+      Unpaid only
+    </label>
+  </div>
+  <div class="filter-actions">
+    <button class="button" type="submit">Apply filters</button>
+    <a class="button secondary" href="{{ url_for('fees_list') }}">Clear</a>
+  </div>
+</form>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Fees due</th>
+      <th>Paid</th>
+      <th>Balance</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students %}
+    <tr>
+      <td>{{ student.first_name }} {{ student.last_name }}</td>
+      <td>{{ student.email or "-" }}</td>
+      <td>{{ student.status or "-" }}</td>
+      <td>{{ student.fees_due or "-" }}</td>
+      <td>{{ student.paid_total or 0 }}</td>
+      <td>{{ (student.fees_due or 0) - (student.paid_total or 0) }}</td>
+      <td class="table-actions">
+        <a class="link" href="{{ url_for('fees_edit', student_id=student.id) }}">Update</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="7" class="empty">No students available for fees yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+  const source = new EventSource("{{ url_for('events') }}");
+  source.addEventListener("fees_updated", () => {
+    window.location.reload();
+  });
+  source.addEventListener("students_updated", () => {
+    window.location.reload();
+  });
+</script>
+{% endblock %}

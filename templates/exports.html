@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Exports</h2>
+</div>
+<div class="cards">
+  <div class="card">
+    <div class="card-title">Students</div>
+    <a class="card-link" href="{{ url_for('export_students') }}">Download CSV</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Fees summary</div>
+    <a class="card-link" href="{{ url_for('export_fees') }}">Download CSV</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Payments</div>
+    <a class="card-link" href="{{ url_for('export_payments') }}">Download CSV</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Calendar</div>
+    <a class="card-link" href="{{ url_for('calendar_export') }}">Download .ics</a>
+  </div>
+</div>
+{% endblock %}

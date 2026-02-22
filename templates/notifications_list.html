@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Notifications</h2>
+  <form method="get" class="filter-actions">
+    <label class="checkbox">
+      <input type="checkbox" name="show_paid" value="1" {% if show_paid %}checked{% endif %} />
+      Show paid students
+    </label>
+    <button class="button secondary" type="submit">Apply</button>
+  </form>
+</div>
+<form class="form" method="post" action="{{ url_for('notifications_new') }}">
+  <div class="form-grid">
+    <label>
+      Student
+      <select name="student_id" id="student-select">
+        <option value="">Select student</option>
+        {% for student in students %}
+          <option value="{{ student.id }}"
+            data-email="{{ student.email }}"
+            data-balance="{{ (student.fees_due or 0) - (student.paid_total or 0) }}">
+            {{ student.first_name }} {{ student.last_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Type
+      <select name="type">
+        <option>Email</option>
+        <option>SMS</option>
+      </select>
+    </label>
+    <label>
+      Recipient
+      <input name="recipient" id="recipient-input" required />
+    </label>
+    <label>
+      Enable 4-day fee reminders
+      <input type="checkbox" name="fee_reminder" checked />
+    </label>
+    <label class="full">
+      Message
+      <textarea name="message" id="message-input" rows="3" required></textarea>
+    </label>
+  </div>
+  <button class="button" type="submit">Queue notification</button>
+</form>
+
+<script>
+  const studentSelect = document.getElementById('student-select');
+  const recipientInput = document.getElementById('recipient-input');
+  const messageInput = document.getElementById('message-input');
+
+  const updateMessage = () => {
+    const option = studentSelect.options[studentSelect.selectedIndex];
+    if (!option || !option.value) {
+      return;
+    }
+    const email = option.dataset.email || '';
+    const balance = option.dataset.balance || '0';
+    recipientInput.value = email;
+    messageInput.value = `Hello, your pending fees balance is $${balance}. Please complete payment at your earliest convenience.`;
+  };
+
+  studentSelect.addEventListener('change', updateMessage);
+</script>
+
+<table class="table" style="margin-top: 1.5rem;">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Type</th>
+      <th>Recipient</th>
+      <th>Message</th>
+      <th>Status</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in notifications %}
+    <tr>
+      <td>
+        {% if item.first_name %}
+          {{ item.first_name }} {{ item.last_name }}
+        {% else %}
+          -
+        {% endif %}
+      </td>
+      <td>{{ item.type }}</td>
+      <td>{{ item.recipient }}</td>
+      <td>{{ item.message }}</td>
+      <td>{{ item.status }}</td>
+      <td>{{ item.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" class="empty">No notifications queued yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

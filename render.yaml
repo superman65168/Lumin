@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: medzone
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_URL
+        value: https://rwvidtdzzavbjarpjwhp.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3dmlkdGR6emF2YmphcnBqd2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NDE4ODEsImV4cCI6MjA4NzMxNzg4MX0.aW4hr0phfT04xezcj085Gw8TssQni6oUnKivs2rB35I
+      - key: SUPABASE_DB_URL
+        value: ""
+      - key: DATABASE_PATH
+        value: /var/data/data.db
+    disk:
+      name: medzone-data
+      mountPath: /var/data
+      sizeGB: 1

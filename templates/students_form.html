@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>{{ "Edit student" if student else "Add student" }}</h2>
+  <a class="button secondary" href="{{ url_for('students_list') }}">Back</a>
+</div>
+{% if error %}
+  <div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post" class="form">
+  <div class="form-grid">
+    <label>
+      First name
+      <input name="first_name" value="{{ student.first_name if student else '' }}" required />
+    </label>
+    <label>
+      Last name
+      <input name="last_name" value="{{ student.last_name if student else '' }}" required />
+    </label>
+    <label>
+      Email
+      <input name="email" type="email" value="{{ student.email if student else '' }}" />
+    </label>
+    <label>
+      Country
+      <select name="country" id="country-select">
+        <option value="">Select country</option>
+      </select>
+    </label>
+    <label>
+      Phone
+      <input name="phone" value="{{ student.phone if student else '' }}" />
+    </label>
+    <label>
+      University
+      <select name="university" id="university-select" disabled>
+        <option value="">Select university</option>
+      </select>
+    </label>
+    <label>
+      Tuition fee (auto)
+      <input id="tuition-fee" disabled />
+    </label>
+    <label>
+      Status
+      <input name="status" value="{{ student.status if student else '' }}" />
+    </label>
+    <label>
+      Stage
+      <select name="stage">
+        <option value="">Not set</option>
+        {% for stage in stages %}
+          <option value="{{ stage }}" {% if student and student.stage == stage %}selected{% endif %}>
+            {{ stage }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <button class="button" type="submit">Save</button>
+</form>
+<script>
+  const universitiesByCountry = {{ universities_by_country | safe }};
+  const feesByCountry = {{ fees_by_country | safe }};
+  const countrySelect = document.getElementById('country-select');
+  const universitySelect = document.getElementById('university-select');
+  const feeInput = document.getElementById('tuition-fee');
+  const selectedCountry = "{{ student.country if student else '' }}";
+  const selectedUniversity = "{{ student.university if student else '' }}";
+
+  const renderCountries = () => {
+    const countries = Object.keys(universitiesByCountry).sort();
+    for (const country of countries) {
+      const option = document.createElement('option');
+      option.value = country;
+      option.textContent = country;
+      if (country === selectedCountry) {
+        option.selected = true;
+      }
+      countrySelect.appendChild(option);
+    }
+  };
+
+  const updateFee = () => {
+    const country = countrySelect.value;
+    const university = universitySelect.value;
+    const fee = feesByCountry?.[country]?.[university];
+    feeInput.value = fee ? `$${fee}` : '';
+  };
+
+  const renderUniversities = (country) => {
+    universitySelect.innerHTML = '<option value="">Select university</option>';
+    const universities = universitiesByCountry[country] || [];
+    for (const university of universities) {
+      const option = document.createElement('option');
+      option.value = university;
+      option.textContent = university;
+      if (university === selectedUniversity) {
+        option.selected = true;
+      }
+      universitySelect.appendChild(option);
+    }
+    universitySelect.disabled = universities.length === 0;
+    updateFee();
+  };
+
+  renderCountries();
+  if (selectedCountry) {
+    renderUniversities(selectedCountry);
+    updateFee();
+  }
+
+  countrySelect.addEventListener('change', (event) => {
+    renderUniversities(event.target.value);
+    updateFee();
+  });
+
+  universitySelect.addEventListener('change', updateFee);
+</script>
+{% endblock %}

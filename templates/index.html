@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Medzone Agency Dashboard</h1>
+    <p>Monitor student pipelines, admissions progress, and operational activity in one place.</p>
+  </div>
+</section>
+<section class="cards">
+  <div class="card">
+    <div class="card-title">Students</div>
+    <div class="card-value">{{ counts.students }}</div>
+    <a class="card-link" href="{{ url_for('students_list') }}">Manage students</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Courses</div>
+    <div class="card-value">{{ counts.courses }}</div>
+    <a class="card-link" href="{{ url_for('courses_list') }}">Manage courses</a>
+  </div>
+  <div class="card">
+    <div class="card-title">Staff</div>
+    <div class="card-value">{{ counts.staff }}</div>
+    <a class="card-link" href="{{ url_for('staff_list') }}">Manage staff</a>
+  </div>
+</section>
+{% endblock %}

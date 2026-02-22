@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <h2>Tasks & Reminders</h2>
+</div>
+<form class="form" method="post" action="{{ url_for('tasks_new') }}">
+  <div class="form-grid">
+    <label>
+      Task title
+      <input name="title" required />
+    </label>
+    <label>
+      Due date
+      <input name="due_date" type="date" />
+    </label>
+    <label>
+      Assigned to
+      <select name="assigned_to">
+        <option value="">Unassigned</option>
+        {% for member in staff %}
+          <option value="{{ member.id }}">{{ member.first_name }} {{ member.last_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="full">
+      Notes
+      <input name="notes" />
+    </label>
+  </div>
+  <button class="button" type="submit">Add task</button>
+</form>
+
+<table class="table" style="margin-top: 1.5rem;">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due</th>
+      <th>Assigned</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr>
+      <td>{{ task.title }}</td>
+      <td>{{ task.due_date or '-' }}</td>
+      <td>
+        {% if task.first_name %}
+          {{ task.first_name }} {{ task.last_name }}
+        {% else %}
+          Unassigned
+        {% endif %}
+      </td>
+      <td>{{ task.status }}</td>
+      <td class="table-actions">
+        <form method="post" action="{{ url_for('tasks_update_status', task_id=task.id) }}">
+          <input type="hidden" name="status" value="Done" />
+          <button class="link" type="submit">Mark done</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="5" class="empty">No tasks yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
